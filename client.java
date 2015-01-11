@@ -5,10 +5,17 @@ class client
 {
 	Socket s;
 
-public static void main(String args[])
-{
-	new client("localhost",1025);
-}
+	public static void main(String args[])
+	{
+		try
+		{
+			int port=Integer.parseInt(args[1]);
+			new client(args[0],port);
+		}catch(ArrayIndexOutOfBoundsException e)
+		{
+			System.out.println("java client <Server-IP> <Server-Port>");
+		}
+	}
 
 	client(String srv,int prt)
 	{
