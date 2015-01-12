@@ -87,7 +87,7 @@ class listener extends Thread
 		String temp;
 		do
 		{
-			dos.writeUTF("Your name? (should not be already taken) :");
+			dos.writeUTF("Your name?");
 			temp=dis.readUTF();
 		}while(server.searchMember(temp)==true);
 		m.name=temp;	//set nickname

@@ -10,6 +10,7 @@ class client
 		try
 		{
 			int port=Integer.parseInt(args[1]);
+			System.out.println("Console Group chat - niLesh");
 			new client(args[0],port);
 		}catch(ArrayIndexOutOfBoundsException e)
 		{
@@ -61,16 +62,29 @@ class sender extends Thread
 		}catch(IOException ex) { System.out.println(ex);}
 	}
 
-	static String getString() throws IOException
+	static String getString()
 	 {
-	   System.in.skip(System.in.available());
+	   /*System.in.skip(System.in.available());
 
 	   byte arr[] = new byte[512];
 	   int x;
 	   x= System.in.read(arr);
 	   String temp = new String(arr, 0,x-1);
-	   return temp;
-	 }
+	   return temp;*/
+		String s;
+		try{
+			BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+			s = bufferRead.readLine();
+			int count = 1; 
+			System.out.print(String.format("\033[%dA",count)); // Move up
+			System.out.print("\033[2K"); // Erase line content
+			//System.out.println("We accepted what you typed");
+		}	
+		catch(IOException e)
+		{e.printStackTrace(); s="Error";}
+		return s;
+	}
+
 }
 
 class receiver extends Thread
