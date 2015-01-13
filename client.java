@@ -10,7 +10,7 @@ class client
 		try
 		{
 			int port=Integer.parseInt(args[1]);
-			System.out.println("Console Group chat - niLesh");
+			System.out.println("Console Group chat https://github.com/TheniL/group-chat");
 			new client(args[0],port);
 		}catch(ArrayIndexOutOfBoundsException e)
 		{
@@ -34,8 +34,8 @@ class client
 		}catch(IOException ex)
 		{ System.out.println(ex);
 		}
-		
 	}
+
 }
 
 class sender extends Thread
@@ -56,6 +56,7 @@ class sender extends Thread
 		{
 			do
 			{
+				System.out.print("you : ");
 				temp=getString();
 				dos.writeUTF(temp);
 			}while(!temp.equalsIgnoreCase("bye"));
@@ -64,21 +65,13 @@ class sender extends Thread
 
 	static String getString()
 	 {
-	   /*System.in.skip(System.in.available());
-
-	   byte arr[] = new byte[512];
-	   int x;
-	   x= System.in.read(arr);
-	   String temp = new String(arr, 0,x-1);
-	   return temp;*/
 		String s;
 		try{
 			BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
 			s = bufferRead.readLine();
-			int count = 1; 
-			System.out.print(String.format("\033[%dA",count)); // Move up
-			System.out.print("\033[2K"); // Erase line content
-			//System.out.println("We accepted what you typed");
+			//int count = 1; 
+			//System.out.print(String.format("\033[%dA",count)); // Move up
+			//System.out.print("\033[2K"); // Erase line content
 		}	
 		catch(IOException e)
 		{e.printStackTrace(); s="Error";}
@@ -106,8 +99,10 @@ class receiver extends Thread
 			while(true)
 			{
 				temp=dis.readUTF();
+				System.out.print("\r");
 				System.out.println(temp);
+				System.out.print("you : ");
 			}
-		}catch(IOException ex) { System.out.println(ex);}
+		}catch(IOException ex) { System.err.println(ex);}
 	}
 }

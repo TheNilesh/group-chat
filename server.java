@@ -49,6 +49,8 @@ class server
 	}
 	public static void removeMember(member x)
 	{
+		try{
+		x.sck.close();}catch(IOException ex) { System.err.println(ex);}
 		group.remove(group.indexOf(x));
 	}
 }//server
@@ -61,7 +63,7 @@ class member
 	{
 		sck=s;
 		name="unnamed";
-		new listener(this).start();	//start member to listen to this member
+		new listener(this).start();	//start listening to this member
 	}
 }
 
@@ -87,56 +89,84 @@ class listener extends Thread
 		String temp;
 		do
 		{
-			dos.writeUTF("Your name?");
+			//dos.writeUTF("Your name?");
 			temp=dis.readUTF();
 		}while(server.searchMember(temp)==true);
 		m.name=temp;	//set nickname
+
 		new announcer(temp + " joined.").start();
 
 		do
 		{
 			temp=dis.readUTF(); //get msg from client
-			if(!temp.equals("ping"))
+			if(!isCommand(temp,dos))
 			{
 				new announcer(m,temp).start();		//announce to all		
-			}
-			else
-			{
-				int t=server.group.size();
-				temp="";
-				for(int i=0;i<t;i++)
-					temp=temp + "<" + server.group.get(i).name + ">  ";
-				temp=temp + "\nTotal Members = " + t;
-				dos.writeUTF(temp);
 			}
 		}while(!temp.equalsIgnoreCase("bye"));
 
 		server.removeMember(m);
-		m.sck.close();
 		new announcer(m.name + " left group chat.").start();
 
 		}catch(IOException ex){System.out.println(ex);}
 	}
+
+	boolean isCommand(String msg, DataOutputStream dos) throws IOException
+	{//return False if invalid command
+		String part[]=msg.split(" ");
+		String temp="";
+		switch(part[0])
+		{
+		case "members":
+			{
+				int t=server.group.size();
+				for(int i=0;i<t;i++)
+					temp=temp + "<" + server.group.get(i).name + ">  ";
+				temp=temp + "\nTotal Members = " + t;
+				break;
+			}
+		case "kick":
+			{
+				temp="There's nobody called " + part[1];
+				for(int i=0;i<server.group.size();i++)
+					if(part[1].equals(server.group.get(i).name))
+						{
+							server.removeMember(server.group.get(i));
+							new announcer(m.name + " removed " + part[1]).start();
+							break;
+						}
+				break;
+			}
+		default:
+			return false;
+		}//switch
+		
+		dos.writeUTF(temp);
+		return true;
+	}//fun
 
 }
 
 class announcer extends Thread
 {
 	String message;
+	member senderMember;
 	announcer(member x,String msg)
 	{
+		senderMember=x;
 		message= x.name + " : " + msg ;
 	}
-	announcer(String notif)
+	announcer(String notification)
 	{
-		message = "[" + notif + "]";
+		message = "[" + notification + "]";
 	}
 	public void run()
 	{
 		for(int i=0;i<server.group.size();i++)
-			send(server.group.get(i).sck);
+			if(server.group.get(i)!=senderMember)
+				send(server.group.get(i).sck);
 	}
-	void send(Socket sck)//sends message to membr
+	void send(Socket sck)//sends message to membr sck
 	{
 		try{
 		DataOutputStream dos=new DataOutputStream(sck.getOutputStream());
